@@ -1399,7 +1399,7 @@ const avatarInput =
 // =========================
 
 async function loadProfile() {
-
+loadProfileStats();
   if (!currentUser) {
     return;
   }
