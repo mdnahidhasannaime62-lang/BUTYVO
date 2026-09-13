@@ -539,3 +539,28 @@ box-shadow: 0 12px 25px rgba(90, 65, 210, 0.22);
 .hidden {
 display: none;
 }
+/* =========================
+   BUTYVO VIDEO FEED
+========================= */
+
+.video-feed {
+  width: 100%;
+  max-width: 520px;
+  margin: 20px auto;
+}
+
+.video-empty {
+  padding: 50px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+}
+
+.video-empty h3 {
+  margin: 12px 0 6px;
+}
+
+.video-empty p {
+  color: #817b90;
+  font-size: 14px;
+}
