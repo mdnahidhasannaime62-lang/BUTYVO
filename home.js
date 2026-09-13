@@ -1038,3 +1038,59 @@ async function sendFriendRequest(
   button.textContent = "Request Sent";
   button.disabled = true;
 }
+// =========================
+// BUTYVO VIDEO FEED
+// =========================
+
+async function loadVideos() {
+  const videoFeed = document.getElementById("videoFeed");
+  const videoEmpty = document.getElementById("videoEmpty");
+
+  if (!videoFeed) return;
+
+  const { data: videos, error } = await supabaseClient
+    .from("videos")
+    .select("id, user_id, storage_path, caption, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Video loading error:", error);
+    return;
+  }
+
+  if (!videos || videos.length === 0) {
+    if (videoEmpty) videoEmpty.style.display = "block";
+    return;
+  }
+
+  if (videoEmpty) videoEmpty.style.display = "none";
+
+  videoFeed.innerHTML = "";
+
+  videos.forEach((video) => {
+    const { data } = supabaseClient
+      .storage
+      .from("videos")
+      .getPublicUrl(video.storage_path);
+
+    const videoCard = document.createElement("div");
+    videoCard.className = "video-card";
+
+    videoCard.innerHTML = `
+      <video
+        class="butyvo-video"
+        src="${data.publicUrl}"
+        controls
+        playsinline
+        preload="metadata">
+      </video>
+
+      <div class="video-info">
+        <strong>BUTYVO User</strong>
+        <p>${escapeHTML(video.caption || "")}</p>
+      </div>
+    `;
+
+    videoFeed.appendChild(videoCard);
+  });
+}
