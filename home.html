@@ -145,39 +145,155 @@
   </div>
 </section>
 
-<!-- PROFILE -->
+<!-- PROFILE --><!-- PROFILE -->
 <section class="page" id="profilePage">
+
   <div class="profile-card">
 
-    <div class="avatar" id="profileAvatar">
-      N
+    <div class="profile-cover"></div>
+
+    <div class="profile-main">
+
+      <div class="profile-avatar-wrap">
+
+        <div class="avatar profile-avatar" id="profileAvatar">
+          N
+        </div>
+
+        <label for="avatarInput" class="avatar-edit-btn">
+          ✎
+        </label>
+
+        <input
+          type="file"
+          id="avatarInput"
+          accept="image/*"
+          hidden
+        >
+
+      </div>
+
+      <h2 id="profileName">
+        Loading...
+      </h2>
+
+      <p class="profile-email" id="profileEmail">
+        Loading...
+      </p>
+
+      <p class="profile-bio" id="profileBio">
+        No bio added yet.
+      </p>
+
     </div>
 
-    <h2 id="profileName">Loading...</h2>
-    <p id="profileEmail">Loading...</p>
 
     <div class="profile-stats">
+
       <div>
-        <strong>0</strong>
+        <strong id="profilePostCount">0</strong>
         <span>Posts</span>
       </div>
 
       <div>
-        <strong>0</strong>
+        <strong id="profileFriendCount">0</strong>
         <span>Friends</span>
       </div>
 
       <div>
-        <strong>0</strong>
+        <strong id="profileLikeCount">0</strong>
         <span>Likes</span>
       </div>
+
     </div>
+
+
+    <div class="profile-details">
+
+      <div class="profile-detail">
+        <span>🎂</span>
+        <div>
+          <small>Age</small>
+          <strong id="profileAge">Not added</strong>
+        </div>
+      </div>
+
+      <div class="profile-detail">
+        <span>💼</span>
+        <div>
+          <small>Profession</small>
+          <strong id="profileProfession">Not added</strong>
+        </div>
+      </div>
+
+      <div class="profile-detail">
+        <span>👨‍👩‍👦</span>
+        <div>
+          <small>Family</small>
+          <strong id="profileFamily">Not added</strong>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="profile-edit">
+
+      <h3>Edit Profile</h3>
+
+      <input
+        type="text"
+        id="editProfileName"
+        placeholder="Full name"
+      >
+
+      <input
+        type="number"
+        id="editProfileAge"
+        placeholder="Age"
+        min="1"
+        max="120"
+      >
+
+      <input
+        type="text"
+        id="editProfileProfession"
+        placeholder="Profession"
+      >
+
+      <input
+        type="text"
+        id="editProfileFamily"
+        placeholder="Family information"
+      >
+
+      <textarea
+        id="editProfileBio"
+        placeholder="Write something about yourself..."
+        rows="3"
+      ></textarea>
+
+      <button
+        id="saveProfileBtn"
+        class="primary-btn"
+        type="button"
+      >
+        Save Profile
+      </button>
+
+      <p id="profileSaveStatus"></p>
+
+    </div>
+
   </div>
+
 
   <button id="logoutBtn" class="logout-btn">
     Log out
   </button>
+
 </section>
+<
 
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
