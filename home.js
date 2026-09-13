@@ -1737,3 +1737,91 @@ if (avatarInput) {
   );
 
 }
+// =========================
+// PROFILE STATS
+// =========================
+
+async function loadProfileStats() {
+
+  if (!currentUser) {
+    return;
+  }
+
+  // Posts count
+  const {
+    count: postCount,
+    error: postError
+  } = await supabaseClient
+    .from("posts")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("user_id", currentUser.id);
+
+
+  if (!postError) {
+    document.getElementById(
+      "profilePostCount"
+    ).textContent = postCount || 0;
+  }
+
+
+  // Friends count
+  const {
+    count: friendCount,
+    error: friendError
+  } = await supabaseClient
+    .from("friend_requests")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .or(
+      `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
+    )
+    .eq("status", "accepted");
+
+
+  if (!friendError) {
+    document.getElementById(
+      "profileFriendCount"
+    ).textContent = friendCount || 0;
+  }
+
+
+  // Likes received
+  const {
+    data: myPosts,
+    error: myPostsError
+  } = await supabaseClient
+    .from("posts")
+    .select("id")
+    .eq("user_id", currentUser.id);
+
+
+  if (!myPostsError && myPosts) {
+
+    let totalLikes = 0;
+
+    for (const post of myPosts) {
+
+      const {
+        count
+      } = await supabaseClient
+        .from("post_likes")
+        .select("*", {
+          count: "exact",
+          head: true
+        })
+        .eq("post_id", post.id);
+
+      totalLikes += count || 0;
+    }
+
+    document.getElementById(
+      "profileLikeCount"
+    ).textContent = totalLikes;
+  }
+
+}
