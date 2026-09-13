@@ -607,3 +607,39 @@ display: none;
   }
 
 }
+/* =========================
+   BUTYVO VIDEO CARD
+========================= */
+
+.video-card {
+  width: 100%;
+  margin: 16px 0;
+  background: #000;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.butyvo-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  height: auto;
+  object-fit: cover;
+  background: #000;
+}
+
+.video-info {
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.video-info strong {
+  display: block;
+  font-size: 15px;
+}
+
+.video-info p {
+  margin: 5px 0 0;
+  color: #777;
+  font-size: 14px;
+}
