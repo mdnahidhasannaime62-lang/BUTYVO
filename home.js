@@ -1040,60 +1040,136 @@ async function sendFriendRequest(
 }
 // =========================
 // BUTYVO VIDEO FEED
-// =========================
+// =========================/
 
 async function loadVideos() {
-  const videoFeed = document.getElementById("videoFeed");
-  const videoEmpty = document.getElementById("videoEmpty");
 
-  if (!videoFeed) return;
+  const videoFeed =
+    document.getElementById("videoFeed");
 
-  const { data: videos, error } = await supabaseClient
+  const videoEmpty =
+    document.getElementById("videoEmpty");
+
+
+  if (!videoFeed) {
+    return;
+  }
+
+
+  const {
+    data: videos,
+    error
+  } = await supabaseClient
     .from("videos")
-    .select("id, user_id, storage_path, caption, created_at")
-    .order("created_at", { ascending: false });
+    .select(
+      "id, user_id, storage_path, caption, created_at"
+    )
+    .order(
+      "created_at",
+      { ascending: false }
+    );
+
 
   if (error) {
-    console.error("Video loading error:", error);
+
+    console.error(
+      "Video loading error:",
+      error
+    );
+
+    videoFeed.innerHTML =
+      "<p>Unable to load videos.</p>";
+
     return;
   }
 
-  if (!videos || videos.length === 0) {
-    if (videoEmpty) videoEmpty.style.display = "block";
+
+  if (
+    !videos ||
+    videos.length === 0
+  ) {
+
+    if (videoEmpty) {
+      videoEmpty.style.display =
+        "block";
+    }
+
     return;
   }
 
-  if (videoEmpty) videoEmpty.style.display = "none";
+
+  if (videoEmpty) {
+    videoEmpty.style.display =
+      "none";
+  }
+
 
   videoFeed.innerHTML = "";
 
+
   videos.forEach((video) => {
-    const { data } = supabaseClient
+
+    const {
+      data: publicUrlData
+    } = supabaseClient
       .storage
       .from("videos")
-      .getPublicUrl(video.storage_path);
+      .getPublicUrl(
+        video.storage_path
+      );
 
-    const videoCard = document.createElement("div");
-    videoCard.className = "video-card";
+
+    const videoCard =
+      document.createElement("div");
+
+    videoCard.className =
+      "video-card";
+
 
     videoCard.innerHTML = `
+
       <video
         class="butyvo-video"
-        src="${data.publicUrl}"
         controls
         playsinline
-        preload="metadata">
+        preload="metadata"
+        muted
+      >
+        <source
+          src="${publicUrlData.publicUrl}"
+          type="video/mp4"
+        >
+        Your browser does not support
+        video playback.
       </video>
 
       <div class="video-info">
-        <strong>BUTYVO User</strong>
-        <p>${escapeHTML(video.caption || "")}</p>
+
+        <strong>
+          BUTYVO User
+        </strong>
+
+        <p>
+          ${escapeHTML(
+            video.caption || ""
+          )}
+        </p>
+
       </div>
+
     `;
 
-    videoFeed.appendChild(videoCard);
+
+    videoFeed.appendChild(
+      videoCard
+    );
+
   });
+
 }
+
+
+
 // =========================
 // VIDEO UPLOAD
 // =========================
