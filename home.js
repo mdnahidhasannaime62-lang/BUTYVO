@@ -206,24 +206,24 @@ document
 
 async function loadPosts() {
 
-  const {
-    data: posts,
-    error
-  } = await supabaseClient
-    .from("posts")
-    .select("
-  id,
-  content,
-  created_at,
-  user_id,
-  profiles (
-    full_name,
-    avatar_url
-`)  
-`)
-    .order("created_at", {
-      ascending: false
-    });
+const {
+  data: posts,
+  error
+} = await supabaseClient
+  .from("posts")
+  .select(`
+    id,
+    content,
+    created_at,
+    user_id,
+    profiles (
+      full_name,
+      avatar_url
+    )
+  `)
+  .order("created_at", {
+    ascending: false
+  });
 
   if (error) {
 
@@ -289,7 +289,15 @@ async function loadPosts() {
 
 
   feed.innerHTML = posts.map(function (post) {
+    const postProfile =
+      post.profiles || {};
 
+    const postUserName =
+      postProfile.full_name ||
+      "BUTYVO User";
+
+    const postAvatarUrl =
+      postProfile.avatar_url || "";
     const postLikes =
       (likes || []).filter(function (like) {
         return like.post_id === post.id;
