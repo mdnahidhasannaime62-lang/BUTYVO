@@ -387,15 +387,54 @@ const {
 
       <article class="post-card">
 
-        <div class="post-header">
+        
 
-          <div class="post-avatar">
-            ${
-              isMyPost
-                ? escapeHTML(
-                    currentUserName
-                      .charAt(0)
-                      .toUpperCase()
+          <div class="post-header">
+
+  <div class="post-avatar">
+    ${
+      postAvatarUrl
+        ? `
+          <img
+            src="${postAvatarUrl}"
+            alt="Profile picture"
+          >
+        `
+        : escapeHTML(
+            postUserName
+              .charAt(0)
+              .toUpperCase()
+          )
+    }
+  </div>
+
+  <div class="post-user">
+
+    <strong>
+      ${escapeHTML(postUserName)}
+    </strong>
+
+    <small>
+      ${date.toLocaleString()}
+    </small>
+
+  </div>
+
+  ${
+    post.user_id === currentUser.id
+      ? `
+        <button
+          class="delete-post"
+          data-id="${post.id}"
+        >
+          Delete
+        </button>
+      `
+      : ""
+  }
+
+</div>
+      
                   )
                 : "U"
             }
