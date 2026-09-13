@@ -211,7 +211,16 @@ async function loadPosts() {
     error
   } = await supabaseClient
     .from("posts")
-    .select("id, content, created_at, user_id")
+    .select("
+  id,
+  content,
+  created_at,
+  user_id,
+  profiles (
+    full_name,
+    avatar_url
+`)  
+`)
     .order("created_at", {
       ascending: false
     });
