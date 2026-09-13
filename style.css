@@ -426,3 +426,116 @@ button {
     width: calc(100% - 20px);
   }
 }
+/* =========================
+BUTYVO AUTH PAGE
+========================= */
+
+.auth-body {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.auth-container {
+width: 100%;
+max-width: 460px;
+padding: 20px;
+}
+
+.auth-card {
+background: rgba(255, 255, 255, 0.92);
+border: 1px solid rgba(255, 255, 255, 0.9);
+border-radius: 28px;
+padding: 32px 26px;
+box-shadow: 0 20px 60px rgba(60, 40, 120, 0.15);
+}
+
+.auth-brand {
+text-align: center;
+margin-bottom: 30px;
+}
+
+.auth-brand h1 {
+font-size: 36px;
+font-weight: 900;
+letter-spacing: 3px;
+background: linear-gradient(90deg, #693cff, #008cff, #df3b99);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.auth-brand p {
+margin-top: 8px;
+color: #817b90;
+}
+
+.auth-tabs {
+display: flex;
+gap: 8px;
+padding: 5px;
+margin-bottom: 24px;
+border-radius: 14px;
+background: #f0edff;
+}
+
+.auth-tab {
+flex: 1;
+border: none;
+padding: 12px;
+border-radius: 10px;
+background: transparent;
+color: #817b90;
+font-weight: 700;
+}
+
+.auth-tab.active {
+color: #693cff;
+background: white;
+box-shadow: 0 5px 15px rgba(70, 50, 150, 0.1);
+}
+
+.auth-form {
+display: flex;
+flex-direction: column;
+gap: 9px;
+}
+
+.auth-form label {
+margin-top: 8px;
+font-size: 13px;
+font-weight: 700;
+color: #40394f;
+}
+
+.auth-form input {
+width: 100%;
+padding: 14px;
+border: 1px solid #e5e1ee;
+border-radius: 13px;
+outline: none;
+font-size: 15px;
+background: #faf9ff;
+}
+
+.auth-form input:focus {
+border-color: #693cff;
+box-shadow: 0 0 0 3px rgba(105, 60, 255, 0.1);
+}
+
+.auth-submit {
+width: 100%;
+margin-top: 16px;
+padding: 14px;
+border: none;
+border-radius: 13px;
+color: white;
+font-size: 15px;
+font-weight: 700;
+background: linear-gradient(135deg, #693cff, #008cff, #df3b99);
+box-shadow: 0 12px 25px rgba(90, 65, 210, 0.22);
+}
+
+.hidden {
+display: none;
+}
