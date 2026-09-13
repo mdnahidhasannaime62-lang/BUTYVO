@@ -100,10 +100,20 @@
   <div class="video-upload-card">
     <h3>Upload a video</h3>
 
-    <input
-      type="file"
-      id="videoInput"
-      accept="video/*"
+    <label for="videoInput" class="video-select-btn">
+  Choose Video
+</label>
+
+<input
+  type="file"
+  id="videoInput"
+  accept="video/*"
+  hidden
+>
+
+<p id="selectedVideoName">
+  No video selected
+</p>
     >
 
     <input
