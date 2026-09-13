@@ -1098,66 +1098,174 @@ async function loadVideos() {
 // VIDEO UPLOAD
 // =========================
 
-const videoInput = document.getElementById("videoInput");
-const videoCaption = document.getElementById("videoCaption");
-const videoUploadBtn = document.getElementById("videoUploadBtn");
-const videoUploadStatus = document.getElementById("videoUploadStatus");
+const videoInput =
+  document.getElementById("videoInput");
+
+const videoCaption =
+  document.getElementById("videoCaption");
+
+const videoUploadBtn =
+  document.getElementById("videoUploadBtn");
+
+const videoUploadStatus =
+  document.getElementById("videoUploadStatus");
+
+
+if (videoInput) {
+
+  videoInput.addEventListener("change", function () {
+
+    const file = videoInput.files[0];
+
+    if (file) {
+      videoUploadStatus.textContent =
+        "Selected: " + file.name;
+    } else {
+      videoUploadStatus.textContent =
+        "No video selected.";
+    }
+
+  });
+
+}
+
 
 if (videoUploadBtn) {
-  videoUploadBtn.addEventListener("click", async function () {
-    const file = videoInput.files[0];
-    const caption = videoCaption.value.trim();
 
-    if (!file) {
-      alert("Please select a video first.");
-      return;
+  videoUploadBtn.addEventListener(
+    "click",
+    async function () {
+
+      const file =
+        videoInput.files[0];
+
+      const caption =
+        videoCaption.value.trim();
+
+
+      if (!file) {
+
+        alert(
+          "Please choose a video first."
+        );
+
+        return;
+      }
+
+
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+      }
+
+
+      videoUploadBtn.disabled = true;
+
+      videoUploadStatus.textContent =
+        "Uploading video...";
+
+
+      const safeFileName =
+        file.name.replace(
+          /[^a-zA-Z0-9._-]/g,
+          "-"
+        );
+
+
+      const fileName =
+        currentUser.id +
+        "/" +
+        Date.now() +
+        "-" +
+        safeFileName;
+
+
+      const {
+        error: uploadError
+      } = await supabaseClient
+        .storage
+        .from("videos")
+        .upload(
+          fileName,
+          file
+        );
+
+
+      if (uploadError) {
+
+        console.error(
+          "Upload error:",
+          uploadError
+        );
+
+        videoUploadStatus.textContent =
+          "Upload failed: " +
+          uploadError.message;
+
+        videoUploadBtn.disabled =
+          false;
+
+        return;
+      }
+
+
+      const {
+        error: databaseError
+      } = await supabaseClient
+        .from("videos")
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          storage_path:
+            fileName,
+
+          caption:
+            caption
+
+        });
+
+
+      if (databaseError) {
+
+        console.error(
+          "Database error:",
+          databaseError
+        );
+
+        videoUploadStatus.textContent =
+          "Video uploaded, but saving failed.";
+
+        videoUploadBtn.disabled =
+          false;
+
+        return;
+      }
+
+
+      videoUploadStatus.textContent =
+        "Video uploaded successfully!";
+
+
+      videoInput.value = "";
+
+      videoCaption.value = "";
+
+
+      await loadVideos();
+
+
+      videoUploadBtn.disabled =
+        false;
+
     }
+  );
 
-    if (!currentUser) {
-      alert("Please log in first.");
-      return;
-    }
-
-    videoUploadBtn.disabled = true;
-    videoUploadStatus.textContent = "Uploading video...";
-
-    const fileName =
-      `${currentUser.id}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-
-    const { error: uploadError } = await supabaseClient
-      .storage
-      .from("videos")
-      .upload(fileName, file);
-
-    if (uploadError) {
-      console.error(uploadError);
-      videoUploadStatus.textContent = "Upload failed.";
-      videoUploadBtn.disabled = false;
-      return;
-    }
-
-    const { error: databaseError } = await supabaseClient
-      .from("videos")
-      .insert({
-        user_id: currentUser.id,
-        storage_path: fileName,
-        caption: caption
-      });
-
-    if (databaseError) {
-      console.error(databaseError);
-      videoUploadStatus.textContent = "Video uploaded, but saving failed.";
-      videoUploadBtn.disabled = false;
-      return;
-    }
-
-    videoUploadStatus.textContent = "Video uploaded successfully!";
-
-    videoInput.value = "";
-    videoCaption.value = "";
-
-    await loadVideos();
-
-    videoUploadBtn.disabled = false;
-  });
 }
+
+
