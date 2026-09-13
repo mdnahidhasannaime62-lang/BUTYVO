@@ -1344,4 +1344,396 @@ if (videoUploadBtn) {
 
 }
 
+// =========================
+// BUTYVO PROFILE SYSTEM
+// =========================
 
+const profileAvatar =
+  document.getElementById("profileAvatar");
+
+const profileName =
+  document.getElementById("profileName");
+
+const profileEmail =
+  document.getElementById("profileEmail");
+
+const profileBio =
+  document.getElementById("profileBio");
+
+const profileAge =
+  document.getElementById("profileAge");
+
+const profileProfession =
+  document.getElementById("profileProfession");
+
+const profileFamily =
+  document.getElementById("profileFamily");
+
+const editProfileName =
+  document.getElementById("editProfileName");
+
+const editProfileAge =
+  document.getElementById("editProfileAge");
+
+const editProfileProfession =
+  document.getElementById("editProfileProfession");
+
+const editProfileFamily =
+  document.getElementById("editProfileFamily");
+
+const editProfileBio =
+  document.getElementById("editProfileBio");
+
+const saveProfileBtn =
+  document.getElementById("saveProfileBtn");
+
+const profileSaveStatus =
+  document.getElementById("profileSaveStatus");
+
+const avatarInput =
+  document.getElementById("avatarInput");
+
+
+// =========================
+// LOAD PROFILE
+// =========================
+
+async function loadProfile() {
+
+  if (!currentUser) {
+    return;
+  }
+
+  const {
+    data: profile,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select(`
+      full_name,
+      avatar_url,
+      age,
+      profession,
+      family_info,
+      bio
+    `)
+    .eq("id", currentUser.id)
+    .single();
+
+
+  if (error) {
+
+    console.error(
+      "Profile loading error:",
+      error
+    );
+
+    return;
+  }
+
+
+  profileName.textContent =
+    profile.full_name || "BUTYVO User";
+
+  profileEmail.textContent =
+    currentUser.email || "";
+
+  profileBio.textContent =
+    profile.bio || "No bio added yet.";
+
+  profileAge.textContent =
+    profile.age || "Not added";
+
+  profileProfession.textContent =
+    profile.profession || "Not added";
+
+  profileFamily.textContent =
+    profile.family_info || "Not added";
+
+
+  editProfileName.value =
+    profile.full_name || "";
+
+  editProfileAge.value =
+    profile.age || "";
+
+  editProfileProfession.value =
+    profile.profession || "";
+
+  editProfileFamily.value =
+    profile.family_info || "";
+
+  editProfileBio.value =
+    profile.bio || "";
+
+
+  if (profile.avatar_url) {
+
+    profileAvatar.innerHTML = `
+      <img
+        src="${profile.avatar_url}"
+        alt="Profile picture"
+      >
+    `;
+
+  } else {
+
+    const firstLetter =
+      (profile.full_name || "N")
+        .charAt(0)
+        .toUpperCase();
+
+    profileAvatar.textContent =
+      firstLetter;
+
+  }
+
+}
+
+
+// =========================
+// SAVE PROFILE
+// =========================
+
+if (saveProfileBtn) {
+
+  saveProfileBtn.addEventListener(
+    "click",
+    async function () {
+
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+      }
+
+
+      const name =
+        editProfileName.value.trim();
+
+      const age =
+        editProfileAge.value
+          ? Number(editProfileAge.value)
+          : null;
+
+      const profession =
+        editProfileProfession.value.trim();
+
+      const family =
+        editProfileFamily.value.trim();
+
+      const bio =
+        editProfileBio.value.trim();
+
+
+      if (!name) {
+
+        alert(
+          "Please enter your name."
+        );
+
+        return;
+      }
+
+
+      saveProfileBtn.disabled = true;
+
+      profileSaveStatus.textContent =
+        "Saving profile...";
+
+
+      const {
+        error
+      } = await supabaseClient
+        .from("profiles")
+        .update({
+
+          full_name: name,
+
+          age: age,
+
+          profession: profession,
+
+          family_info: family,
+
+          bio: bio
+
+        })
+        .eq(
+          "id",
+          currentUser.id
+        );
+
+
+      if (error) {
+
+        console.error(
+          "Profile save error:",
+          error
+        );
+
+        profileSaveStatus.textContent =
+          "Failed to save profile.";
+
+        saveProfileBtn.disabled =
+          false;
+
+        return;
+      }
+
+
+      profileSaveStatus.textContent =
+        "Profile saved successfully!";
+
+
+      await loadProfile();
+
+
+      saveProfileBtn.disabled =
+        false;
+
+    }
+  );
+
+}
+
+
+// =========================
+// PROFILE PICTURE UPLOAD
+// =========================
+
+if (avatarInput) {
+
+  avatarInput.addEventListener(
+    "change",
+    async function () {
+
+      const file =
+        avatarInput.files[0];
+
+
+      if (!file) {
+        return;
+      }
+
+
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+      }
+
+
+      if (!file.type.startsWith("image/")) {
+
+        alert(
+          "Please choose an image."
+        );
+
+        avatarInput.value = "";
+
+        return;
+      }
+
+
+      profileSaveStatus.textContent =
+        "Uploading profile picture...";
+
+
+      const safeFileName =
+        file.name.replace(
+          /[^a-zA-Z0-9._-]/g,
+          "-"
+        );
+
+
+      const filePath =
+        currentUser.id +
+        "/" +
+        Date.now() +
+        "-" +
+        safeFileName;
+
+
+      const {
+        error: uploadError
+      } = await supabaseClient
+        .storage
+        .from("avatars")
+        .upload(
+          filePath,
+          file
+        );
+
+
+      if (uploadError) {
+
+        console.error(
+          "Avatar upload error:",
+          uploadError
+        );
+
+        profileSaveStatus.textContent =
+          "Profile picture upload failed.";
+
+        return;
+      }
+
+
+      const {
+        data: publicUrlData
+      } = supabaseClient
+        .storage
+        .from("avatars")
+        .getPublicUrl(
+          filePath
+        );
+
+
+      const avatarUrl =
+        publicUrlData.publicUrl;
+
+
+      const {
+        error: updateError
+      } = await supabaseClient
+        .from("profiles")
+        .update({
+          avatar_url: avatarUrl
+        })
+        .eq(
+          "id",
+          currentUser.id
+        );
+
+
+      if (updateError) {
+
+        console.error(
+          "Avatar save error:",
+          updateError
+        );
+
+        profileSaveStatus.textContent =
+          "Picture uploaded but profile update failed.";
+
+        return;
+      }
+
+
+      profileSaveStatus.textContent =
+        "Profile picture updated!";
+
+
+      await loadProfile();
+
+    }
+  );
+
+}
