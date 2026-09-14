@@ -338,5 +338,84 @@
 
 </nav>
 
-  </main>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script src="home.js"></script></body>
+  </main> 
+  <!-- =========================
+     BUTYVO AI CHAT
+========================= -->
+
+<section class="ai-chat-panel" id="aiChatPanel">
+
+  <div class="ai-chat-header">
+
+    <div class="ai-title">
+
+      <div class="ai-avatar">
+        ✦
+      </div>
+
+      <div>
+        <strong>BUTYVO AI</strong>
+        <small>Always ready to help</small>
+      </div>
+
+    </div>
+
+    <button
+      class="ai-close-btn"
+      id="aiCloseBtn"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div
+    class="ai-chat-messages"
+    id="aiChatMessages"
+  >
+
+    <div class="ai-message">
+
+      <div class="ai-message-avatar">
+        ✦
+      </div>
+
+      <div class="ai-bubble">
+        Hi! 👋 I'm BUTYVO AI.<br>
+        How can I help you today?
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="ai-chat-input-area">
+
+    <input
+      type="text"
+      id="aiChatInput"
+      placeholder="Ask BUTYVO AI anything..."
+    >
+
+    <button
+      id="aiSendBtn"
+      class="ai-send-btn"
+    >
+      ➤
+    </button>
+
+  </div>
+
+</section>
+
+
+<button
+  class="ai-floating-btn"
+  id="aiFloatingBtn"
+>
+  ✦
+</button>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script src="home.js"></script></body>
 </html>
