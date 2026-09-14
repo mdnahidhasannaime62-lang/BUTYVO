@@ -1950,3 +1950,520 @@ async function loadProfileStats() {
   }
 
 }
+/* =========================
+   BUTYVO AI CHAT SYSTEM
+========================= */
+
+const aiFloatingBtn =
+  document.getElementById("aiFloatingBtn");
+
+const aiChatPanel =
+  document.getElementById("aiChatPanel");
+
+const aiCloseBtn =
+  document.getElementById("aiCloseBtn");
+
+const aiChatMessages =
+  document.getElementById("aiChatMessages");
+
+const aiChatInput =
+  document.getElementById("aiChatInput");
+
+const aiSendBtn =
+  document.getElementById("aiSendBtn");
+
+const aiVoiceBtn =
+  document.getElementById("aiVoiceBtn");
+
+const aiVoiceToggle =
+  document.getElementById("aiVoiceToggle");
+
+
+/* =========================
+   OPEN / CLOSE AI
+========================= */
+
+if (aiFloatingBtn && aiChatPanel) {
+
+  aiFloatingBtn.addEventListener(
+    "click",
+    function () {
+
+      aiChatPanel.style.display = "flex";
+
+      setTimeout(function () {
+        aiChatInput.focus();
+      }, 200);
+
+    }
+  );
+
+}
+
+
+if (aiCloseBtn && aiChatPanel) {
+
+  aiCloseBtn.addEventListener(
+    "click",
+    function () {
+
+      aiChatPanel.style.display = "none";
+
+      window.speechSynthesis.cancel();
+
+    }
+  );
+
+}
+
+
+/* =========================
+   VOICE SETTINGS
+========================= */
+
+let aiVoiceEnabled = true;
+
+
+/* =========================
+   TOGGLE AI VOICE
+========================= */
+
+if (aiVoiceToggle) {
+
+  aiVoiceToggle.addEventListener(
+    "click",
+    function () {
+
+      aiVoiceEnabled =
+        !aiVoiceEnabled;
+
+
+      if (aiVoiceEnabled) {
+
+        aiVoiceToggle.textContent =
+          "🔊";
+
+        aiVoiceToggle.classList.remove(
+          "muted"
+        );
+
+        aiVoiceToggle.title =
+          "AI Voice On";
+
+      } else {
+
+        aiVoiceToggle.textContent =
+          "🔇";
+
+        aiVoiceToggle.classList.add(
+          "muted"
+        );
+
+        aiVoiceToggle.title =
+          "AI Voice Off";
+
+        window.speechSynthesis.cancel();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   ADD USER MESSAGE
+========================= */
+
+function addUserMessage(text) {
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "user-ai-message";
+
+
+  message.innerHTML = `
+
+    <div class="user-ai-bubble">
+      ${escapeHTML(text)}
+    </div>
+
+  `;
+
+
+  aiChatMessages.appendChild(
+    message
+  );
+
+
+  scrollAIChat();
+
+}
+
+
+/* =========================
+   ADD AI MESSAGE
+========================= */
+
+function addAIMessage(text) {
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "ai-message";
+
+
+  message.innerHTML = `
+
+    <div class="ai-message-avatar">
+      ✦
+    </div>
+
+    <div class="ai-bubble">
+      ${escapeHTML(text)}
+    </div>
+
+  `;
+
+
+  aiChatMessages.appendChild(
+    message
+  );
+
+
+  scrollAIChat();
+
+
+  speakAI(text);
+
+}
+
+
+/* =========================
+   SCROLL CHAT
+========================= */
+
+function scrollAIChat() {
+
+  aiChatMessages.scrollTop =
+    aiChatMessages.scrollHeight;
+
+}
+
+
+/* =========================
+   DEMO AI REPLY
+========================= */
+
+function getDemoAIReply(message) {
+
+  const text =
+    message.toLowerCase();
+
+
+  if (
+    text.includes("hello") ||
+    text.includes("hi") ||
+    text.includes("হ্যালো")
+  ) {
+
+    return "Hello! 👋 I'm BUTYVO AI. How can I help you?";
+
+  }
+
+
+  if (
+    text.includes("how are you") ||
+    text.includes("কেমন আছ")
+  ) {
+
+    return "I'm doing great! 😊 I'm always ready to help you.";
+
+  }
+
+
+  if (
+    text.includes("butyvo")
+  ) {
+
+    return "BUTYVO is your modern social platform. 🚀";
+
+  }
+
+
+  return (
+    "That's interesting! 🤖 I'm currently in demo mode. " +
+    "Soon I'll become a real AI assistant!"
+  );
+
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+function sendAIMessage() {
+
+  const text =
+    aiChatInput.value.trim();
+
+
+  if (!text) {
+    return;
+  }
+
+
+  addUserMessage(text);
+
+
+  aiChatInput.value = "";
+
+
+  setTimeout(
+    function () {
+
+      const reply =
+        getDemoAIReply(text);
+
+
+      addAIMessage(reply);
+
+    },
+    500
+  );
+
+}
+
+
+/* SEND BUTTON */
+
+if (aiSendBtn) {
+
+  aiSendBtn.addEventListener(
+    "click",
+    sendAIMessage
+  );
+
+}
+
+
+/* ENTER KEY */
+
+if (aiChatInput) {
+
+  aiChatInput.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        sendAIMessage();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   SPEECH TO TEXT
+========================= */
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+
+let recognition = null;
+
+
+if (SpeechRecognition) {
+
+  recognition =
+    new SpeechRecognition();
+
+
+  recognition.continuous =
+    false;
+
+
+  recognition.interimResults =
+    true;
+
+
+  recognition.lang =
+    "bn-BD";
+
+
+  recognition.onstart =
+    function () {
+
+      aiVoiceBtn.classList.add(
+        "listening"
+      );
+
+  };
+
+
+  recognition.onresult =
+    function (event) {
+
+      let transcript =
+        "";
+
+
+      for (
+        let i =
+          event.resultIndex;
+
+        i <
+          event.results.length;
+
+        i++
+      ) {
+
+        transcript +=
+          event.results[i][0]
+            .transcript;
+
+      }
+
+
+      aiChatInput.value =
+        transcript;
+
+  };
+
+
+  recognition.onend =
+    function () {
+
+      aiVoiceBtn.classList.remove(
+        "listening"
+      );
+
+  };
+
+
+  recognition.onerror =
+    function (event) {
+
+      console.error(
+        "Voice error:",
+        event.error
+      );
+
+
+      aiVoiceBtn.classList.remove(
+        "listening"
+      );
+
+
+      if (
+        event.error ===
+        "not-allowed"
+      ) {
+
+        alert(
+          "Please allow microphone permission."
+        );
+
+      }
+
+    };
+
+
+  if (aiVoiceBtn) {
+
+    aiVoiceBtn.addEventListener(
+      "click",
+      function () {
+
+        try {
+
+          recognition.start();
+
+        } catch (error) {
+
+          recognition.stop();
+
+        }
+
+      }
+    );
+
+  }
+
+} else {
+
+  if (aiVoiceBtn) {
+
+    aiVoiceBtn.addEventListener(
+      "click",
+      function () {
+
+        alert(
+          "Voice input is not supported in this browser."
+        );
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================
+   AI TEXT TO SPEECH
+========================= */
+
+function speakAI(text) {
+
+  if (!aiVoiceEnabled) {
+    return;
+  }
+
+
+  if (
+    !("speechSynthesis" in window)
+  ) {
+    return;
+  }
+
+
+  window.speechSynthesis.cancel();
+
+
+  const speech =
+    new SpeechSynthesisUtterance(
+      text
+    );
+
+
+  speech.lang =
+    "en-US";
+
+
+  speech.rate =
+    1;
+
+
+  speech.pitch =
+    1.1;
+
+
+  window.speechSynthesis.speak(
+    speech
+  );
+
+}
