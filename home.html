@@ -392,21 +392,47 @@
 
 
   <div class="ai-chat-input-area">
+    <!-- =========================
+     ADVANCED AI INPUT
+========================= -->
+
+<div class="ai-chat-input-area">
 
   <button
     id="aiVoiceBtn"
     class="ai-voice-btn"
     type="button"
-    aria-label="Voice input"
+    aria-label="Start voice input"
   >
-    🎤
+    <span class="voice-icon">🎤</span>
+
+    <span class="voice-wave">
+      <i></i>
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
   </button>
+
 
   <input
     type="text"
     id="aiChatInput"
-    placeholder="Ask BUTYVO AI anything..."
+    placeholder="Message BUTYVO AI..."
+    autocomplete="off"
   >
+
+
+  <button
+    id="aiVoiceToggle"
+    class="ai-speaker-btn"
+    type="button"
+    aria-label="Toggle AI voice"
+    title="AI Voice On"
+  >
+    🔊
+  </button>
+
 
   <button
     id="aiSendBtn"
@@ -417,7 +443,7 @@
     ➤
   </button>
 
-  </div>
+</div>
 
 </section>
 
