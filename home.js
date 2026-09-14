@@ -206,24 +206,16 @@ document
 
 async function loadPosts() {
 
-const {
-  data: posts,
-  error
-} = await supabaseClient
-  .from("posts")
-  .select(`
-    id,
-    content,
-    created_at,
-    user_id,
-    profiles (
-      full_name,
-      avatar_url
-    )
-  `)
-  .order("created_at", {
-    ascending: false
-  });
+  const {
+    data: posts,
+    error
+  } = await supabaseClient
+    .from("posts")
+    .select("id, content, created_at, user_id")
+    .order("created_at", {
+      ascending: false
+    });
+
 
   if (error) {
 
@@ -235,12 +227,15 @@ const {
     return;
   }
 
+
   const feed =
     document.querySelector(".empty-feed");
+
 
   if (!feed) {
     return;
   }
+
 
   if (!posts || posts.length === 0) {
 
@@ -254,7 +249,9 @@ const {
   }
 
 
-  /* Get likes */
+  /* =========================
+     GET LIKES
+  ========================= */
 
   const {
     data: likes,
@@ -263,22 +260,31 @@ const {
     .from("post_likes")
     .select("post_id, user_id");
 
+
   if (likesError) {
-    console.error("Likes loading error:", likesError);
+    console.error(
+      "Likes loading error:",
+      likesError
+    );
   }
 
 
-  /* Get comments */
+  /* =========================
+     GET COMMENTS
+  ========================= */
 
   const {
     data: comments,
     error: commentsError
   } = await supabaseClient
     .from("comments")
-    .select("id, post_id, user_id, content, created_at")
+    .select(
+      "id, post_id, user_id, content, created_at"
+    )
     .order("created_at", {
       ascending: true
     });
+
 
   if (commentsError) {
     console.error(
@@ -288,264 +294,327 @@ const {
   }
 
 
-  feed.innerHTML = posts.map(function (post) {
-    const postProfile =
-      post.profiles || {};
+  /* =========================
+     DISPLAY POSTS
+  ========================= */
 
-    const postUserName =
-      postProfile.full_name ||
-      "BUTYVO User";
-
-    const postAvatarUrl =
-      postProfile.avatar_url || "";
-    const postLikes =
-      (likes || []).filter(function (like) {
-        return like.post_id === post.id;
-      });
-
-    const postComments =
-      (comments || []).filter(function (comment) {
-        return comment.post_id === post.id;
-      });
-
-    const likedByMe =
-      postLikes.some(function (like) {
-        return like.user_id === currentUser.id;
-      });
-
-    const date =
-      new Date(post.created_at);
-
-    const isMyPost =
-      currentUser &&
-      post.user_id === currentUser.id;
+  feed.innerHTML =
+    posts.map(function (post) {
 
 
-    const commentsHTML =
-      postComments.map(function (comment) {
+      const postLikes =
+        (likes || []).filter(function (like) {
+          return like.post_id === post.id;
+        });
 
-        const commentDate =
-          new Date(comment.created_at);
 
-        const isMyComment =
-          comment.user_id === currentUser.id;
+      const postComments =
+        (comments || []).filter(
+          function (comment) {
+            return comment.post_id === post.id;
+          }
+        );
 
-        return `
-          <div class="comment-item">
 
-            <div class="comment-avatar">
-              ${comment.user_id === currentUser.id
-                ? escapeHTML(
-                    currentUserName
-                      .charAt(0)
-                      .toUpperCase()
-                  )
-                : "U"
+      const likedByMe =
+        postLikes.some(function (like) {
+          return (
+            like.user_id === currentUser.id
+          );
+        });
+
+
+      const date =
+        new Date(post.created_at);
+
+
+      const isMyPost =
+        currentUser &&
+        post.user_id === currentUser.id;
+
+
+      /* =========================
+         COMMENTS HTML
+      ========================= */
+
+      const commentsHTML =
+        postComments.map(
+          function (comment) {
+
+
+            const commentDate =
+              new Date(
+                comment.created_at
+              );
+
+
+            const isMyComment =
+              currentUser &&
+              comment.user_id === currentUser.id;
+
+
+            return `
+
+              <div class="comment-item">
+
+                <div class="comment-avatar">
+
+                  ${
+                    isMyComment
+                      ? escapeHTML(
+                          currentUserName
+                            .charAt(0)
+                            .toUpperCase()
+                        )
+                      : "U"
+                  }
+
+                </div>
+
+
+                <div class="comment-body">
+
+                  <strong>
+
+                    ${
+                      isMyComment
+                        ? escapeHTML(
+                            currentUserName
+                          )
+                        : "BUTYVO User"
+                    }
+
+                  </strong>
+
+
+                  <p>
+
+                    ${escapeHTML(
+                      comment.content
+                    )}
+
+                  </p>
+
+
+                  <small>
+
+                    ${commentDate.toLocaleString()}
+
+                  </small>
+
+                </div>
+
+
+                ${
+                  isMyComment
+                    ? `
+
+                      <button
+                        class="delete-comment"
+                        data-id="${comment.id}"
+                      >
+                        ×
+                      </button>
+
+                    `
+                    : ""
+                }
+
+              </div>
+
+            `;
+
+          }
+        ).join("");
+
+
+      /* =========================
+         POST CARD
+      ========================= */
+
+      return `
+
+        <article class="post-card">
+
+
+          <div class="post-header">
+
+
+            <div class="post-avatar">
+
+              ${
+                isMyPost
+                  ? escapeHTML(
+                      currentUserName
+                        .charAt(0)
+                        .toUpperCase()
+                    )
+                  : "U"
               }
+
             </div>
 
-            <div class="comment-body">
+
+            <div class="post-user">
+
 
               <strong>
+
                 ${
-                  comment.user_id === currentUser.id
-                    ? escapeHTML(currentUserName)
+                  isMyPost
+                    ? escapeHTML(
+                        currentUserName
+                      )
                     : "BUTYVO User"
                 }
+
               </strong>
 
-              <p>
-                ${escapeHTML(comment.content)}
-              </p>
 
               <small>
-                ${commentDate.toLocaleString()}
+
+                ${date.toLocaleString()}
+
               </small>
+
 
             </div>
 
+
             ${
-              isMyComment
+              isMyPost
                 ? `
+
                   <button
-                    class="delete-comment"
-                    data-id="${comment.id}"
+                    class="delete-post"
+                    data-id="${post.id}"
                   >
-                    ×
+                    Delete
                   </button>
+
                 `
                 : ""
             }
 
-          </div>
-        `;
-
-      }).join("");
-
-
-    return `
-
-      <article class="post-card">
-
-        
-
-          <div class="post-header">
-
-  <div class="post-avatar">
-    ${
-      postAvatarUrl
-        ? `
-          <img
-            src="${postAvatarUrl}"
-            alt="Profile picture"
-          >
-        `
-        : escapeHTML(
-            postUserName
-              .charAt(0)
-              .toUpperCase()
-          )
-    }
-  </div>
-
-  <div class="post-user">
-
-    <strong>
-      ${escapeHTML(postUserName)}
-    </strong>
-
-    <small>
-      ${date.toLocaleString()}
-    </small>
-
-  </div>
-
-  ${
-    post.user_id === currentUser.id
-      ? `
-        <button
-          class="delete-post"
-          data-id="${post.id}"
-        >
-          Delete
-        </button>
-      `
-      : ""
-  }
-
-</div>
-      
-                  )
-                : "U"
-            }
-          </div>
-
-          <div class="post-user">
-
-            <strong>
-              ${
-                isMyPost
-                  ? escapeHTML(currentUserName)
-                  : "BUTYVO User"
-              }
-            </strong>
-
-            <small>
-              ${date.toLocaleString()}
-            </small>
 
           </div>
 
-          ${
-            isMyPost
-              ? `
-                <button
-                  class="delete-post"
-                  data-id="${post.id}"
-                >
-                  Delete
-                </button>
-              `
-              : ""
-          }
 
-        </div>
+          <p class="post-content">
+
+            ${escapeHTML(post.content)}
+
+          </p>
 
 
-        <p class="post-content">
-          ${escapeHTML(post.content)}
-        </p>
+          <div class="post-actions">
 
-
-        <div class="post-actions">
-
-          <button
-            class="post-action like-button ${
-              likedByMe ? "liked" : ""
-            }"
-            data-id="${post.id}"
-          >
-            ${likedByMe ? "♥" : "♡"}
-            Like
-            <span>${postLikes.length}</span>
-          </button>
-
-          <button
-            class="post-action comment-toggle"
-            data-id="${post.id}"
-          >
-            💬 Comment
-            <span>${postComments.length}</span>
-          </button>
-
-        </div>
-
-
-        <div
-          class="comments-area"
-          id="comments-${post.id}"
-        >
-
-          ${
-            commentsHTML ||
-            `
-              <p class="no-comments">
-                No comments yet.
-              </p>
-            `
-          }
-
-          <div class="comment-form">
-
-            <input
-              type="text"
-              class="comment-input"
-              data-id="${post.id}"
-              maxlength="300"
-              placeholder="Write a comment..."
-            >
 
             <button
-              class="comment-submit"
+              class="post-action like-button ${
+                likedByMe
+                  ? "liked"
+                  : ""
+              }"
               data-id="${post.id}"
             >
-              Send
+
+              ${
+                likedByMe
+                  ? "♥"
+                  : "♡"
+              }
+
+              Like
+
+              <span>
+                ${postLikes.length}
+              </span>
+
             </button>
+
+
+            <button
+              class="post-action comment-toggle"
+              data-id="${post.id}"
+            >
+
+              💬 Comment
+
+              <span>
+                ${postComments.length}
+              </span>
+
+            </button>
+
 
           </div>
 
-        </div>
 
-      </article>
+          <div
+            class="comments-area"
+            id="comments-${post.id}"
+          >
 
-    `;
 
-  }).join("");
+            ${
+              commentsHTML ||
 
+              `
+
+                <p class="no-comments">
+                  No comments yet.
+                </p>
+
+              `
+            }
+
+
+            <div class="comment-form">
+
+
+              <input
+                type="text"
+                class="comment-input"
+                data-id="${post.id}"
+                maxlength="300"
+                placeholder="Write a comment..."
+              >
+
+
+              <button
+                class="comment-submit"
+                data-id="${post.id}"
+              >
+                Send
+              </button>
+
+
+            </div>
+
+
+          </div>
+
+
+        </article>
+
+      `;
+
+    }).join("");
+
+
+  /* =========================
+     ATTACH EVENTS
+  ========================= */
 
   attachPostEvents();
 
 }
+
+  
+  
+          
+            
 
 
 /* =========================
@@ -553,7 +622,7 @@ const {
 ========================= */
 
 function attachPostEvents() {
-
+  
 
   /* LIKE */
 
